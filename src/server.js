@@ -1,4 +1,3 @@
-// src/server.js
 import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
@@ -12,7 +11,21 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(pino());
+
+app.use(
+  pino({
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        translateTime: 'HH:MM:ss',
+        ignore: 'pid,hostname',
+        messageFormat:
+          '{req.method} {req.url} {res.statusCode} - {responseTime}ms',
+      },
+    },
+  }),
+);
 
 // Routes
 
