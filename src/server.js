@@ -9,23 +9,32 @@ import { logger } from './middleware/logger.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
-import studentsRoutes from './routes/studentsRoutes.js';
+import notesRoutes from './routes/notesRoutes.js'; // тільки маршрути notes
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 
-// глобальні middleware
-app.use(logger);
-app.use(express.json());
-app.use(cors());
+// =======================
+// Глобальні middleware
+// =======================
+app.use(logger); // логування запитів через pino-http
+app.use(express.json()); // парсинг JSON тіла запитів
+app.use(cors()); // дозволяє запити з інших доменів
 
-// підключаємо групу маршрутів студента
-app.use(studentsRoutes);
+// =======================
+// Підключення маршрутів
+// =======================
+app.use(notesRoutes); // маршрути для нотаток
 
-// 404 і обробник помилок — наприкінці ланцюжка
-app.use(notFoundHandler);
-app.use(errorHandler);
+// =======================
+// Middleware 404 та обробки помилок
+// =======================
+app.use(notFoundHandler); // якщо маршрут не знайдено
+app.use(errorHandler); // глобальний обробник помилок
 
+// =======================
+// Підключення до MongoDB та запуск сервера
+// =======================
 await connectMongoDB();
 
 app.listen(PORT, () => {
