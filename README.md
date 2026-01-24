@@ -1,15 +1,26 @@
-# 📒 Notes API — Express.js
+# Notes API
 
-A simple Express.js REST API for working with a notes collection.
-This project demonstrates how to build a minimal web server, handle HTTP requests and responses, use middleware, and structure a backend application.
+A simple RESTful API for managing notes, built with **Node.js**, **Express**, and **MongoDB** (via Mongoose).
 
-## 🛠️ Tech Stack
+### Features
+
+- Create, read, update, and delete notes (CRUD operations)
+- Notes have `title`, `content`, and `tag` fields
+- Automatic timestamps (`createdAt` and `updatedAt`)
+- Centralized error handling
+- 404 handling for unknown routes
+- HTTP request logging via `pino-http`
+
+### Tech Stack
 
 - Node.js
-- Express.js
-- dotenv
-- cors
-- pino-http
-- nodemon
-- ESLint
-- Prettier
+- Express
+- MongoDB with Mongoose
+- dotenv for environment variables
+- pino-http for logging
+- http-errors for standardized HTTP errors
+- CORS enabled
+
+### Running the Server
+
+npm run dev
