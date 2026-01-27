@@ -1,12 +1,41 @@
 // src/controllers/notesController.js
 
 import { Note } from '../models/note.js';
+import { TAGS } from '../constants/tags.js';
 import createHttpError from 'http-errors';
 
-// Отримати всі нотатки
+// Отримати всі нотатки з пагінацією та фільтром
 export const getAllNotes = async (req, res) => {
-  const notes = await Note.find();
-  res.status(200).json(notes);
+  const { page = 1, perPage = 10, tag, search } = req.query;
+  const skip = (page - 1) * perPage;
+
+  // Створюємо базовий запит
+  const notesQuery = Note.find();
+
+  // Фільтр по тегу
+  if (tag && TAGS.includes(tag)) {
+    notesQuery.where('tag').equals(tag);
+  }
+
+  // Пошук по тексту через $text
+  if (search && search.trim() !== '') {
+    notesQuery.where({ $text: { $search: search } });
+  }
+
+  const [totalNotes, notes] = await Promise.all([
+    notesQuery.clone().countDocuments(),
+    notesQuery.skip(skip).limit(Number(perPage)),
+  ]);
+
+  const totalPages = Math.ceil(totalNotes / perPage);
+
+  res.status(200).json({
+    page: Number(page),
+    perPage: Number(perPage),
+    totalNotes,
+    totalPages,
+    notes,
+  });
 };
 
 // Отримати одну нотатку за ID
@@ -15,7 +44,6 @@ export const getNoteById = async (req, res, next) => {
   const note = await Note.findById(noteId);
 
   if (!note) {
-    // Якщо нотатку не знайдено, передаємо помилку в middleware
     next(createHttpError(404, 'Note not found'));
     return;
   }
@@ -35,7 +63,6 @@ export const deleteNote = async (req, res, next) => {
   const note = await Note.findOneAndDelete({ _id: noteId });
 
   if (!note) {
-    // Якщо нотатку не знайдено, передаємо помилку в middleware
     next(createHttpError(404, 'Note not found'));
     return;
   }
@@ -47,11 +74,10 @@ export const deleteNote = async (req, res, next) => {
 export const updateNote = async (req, res, next) => {
   const { noteId } = req.params;
   const note = await Note.findOneAndUpdate({ _id: noteId }, req.body, {
-    new: true, // повертаємо оновлений документ
+    new: true,
   });
 
   if (!note) {
-    // Якщо нотатку не знайдено, передаємо помилку в middleware
     next(createHttpError(404, 'Note not found'));
     return;
   }

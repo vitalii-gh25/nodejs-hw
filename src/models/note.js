@@ -1,6 +1,7 @@
 // src/models/note.js
 
 import { Schema, model } from 'mongoose';
+import { TAGS } from '../constants/tags.js'; // імпортуємо список тегів
 
 // Схема для нотатки
 const noteSchema = new Schema(
@@ -20,18 +21,7 @@ const noteSchema = new Schema(
     // Тег нотатки (обмежений набором значень, за замовчуванням Todo)
     tag: {
       type: String,
-      enum: [
-        'Work',
-        'Personal',
-        'Meeting',
-        'Shopping',
-        'Ideas',
-        'Travel',
-        'Finance',
-        'Health',
-        'Important',
-        'Todo',
-      ],
+      enum: TAGS, // беремо значення з constants/tags.js
       default: 'Todo',
     },
   },
@@ -40,6 +30,9 @@ const noteSchema = new Schema(
     versionKey: false, // не створюємо поле __v
   },
 );
+
+// Додаємо текстовий індекс для швидкого пошуку по title та content
+noteSchema.index({ title: 'text', content: 'text' });
 
 // Експортуємо модель Note
 export const Note = model('Note', noteSchema);

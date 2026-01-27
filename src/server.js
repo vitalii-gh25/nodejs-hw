@@ -3,12 +3,12 @@
 import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
-
+// Імпортуємо middleware
+import { errors } from 'celebrate';
 import { connectMongoDB } from './db/connectMongoDB.js';
 import { logger } from './middleware/logger.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
-
 import notesRoutes from './routes/notesRoutes.js'; // тільки маршрути notes
 
 const app = express();
@@ -30,6 +30,7 @@ app.use(notesRoutes); // маршрути для нотаток
 // Middleware 404 та обробки помилок
 // =======================
 app.use(notFoundHandler); // якщо маршрут не знайдено
+app.use(errors()); // обробка помилок від celebrate (валідація)
 app.use(errorHandler); // глобальний обробник помилок
 
 // =======================
