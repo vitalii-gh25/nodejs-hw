@@ -15,8 +15,12 @@ import {
   createNoteSchema,
   updateNoteSchema,
 } from '../validations/notesValidation.js';
+import { authenticate } from '../middleware/authenticate.js';
 
 const router = Router();
+
+// Додаємо middleware до всіх шляхів, що починаються з /notes
+router.use('/notes', authenticate);
 
 // GET /notes — отримати всі нотатки
 router.get('/notes', celebrate(getAllNotesSchema), getAllNotes);
