@@ -1,5 +1,7 @@
 // src/server.js
 
+import userRoutes from './routes/userRoutes.js';
+
 import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
@@ -29,6 +31,7 @@ app.use(cookieParser()); // парсинг cookie
 // =======================
 app.use(authRoutes); // маршрути для аутентифікації
 app.use(notesRoutes); // маршрути для нотаток
+app.use(userRoutes);
 
 // =======================
 // Middleware 404 та обробки помилок
