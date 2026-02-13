@@ -7,7 +7,6 @@ const userSchema = new Schema(
     username: { type: String, required: false },
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
-    // Нова властивість
     avatar: {
       type: String,
       required: false,
@@ -17,7 +16,15 @@ const userSchema = new Schema(
   { timestamps: true },
 );
 
-// Перевизначаємо метод toJSON
+// Хук pre-save: якщо username не задано, ставимо email
+userSchema.pre('save', function (next) {
+  if (!this.username) {
+    this.username = this.email;
+  }
+  next();
+});
+
+// Перевизначаємо метод toJSON, щоб видаляти пароль
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
