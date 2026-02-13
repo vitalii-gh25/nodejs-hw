@@ -5,7 +5,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 
 import jwt from 'jsonwebtoken';
-import { sendEmail } from '../utils/sendEmail.js';
+import { sendEmail } from '../utils/sendMail.js';
 
 import bcrypt from 'bcrypt';
 import createHttpError from 'http-errors';
