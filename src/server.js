@@ -1,50 +1,36 @@
 // src/server.js
 
-import userRoutes from './routes/userRoutes.js';
-
 import express from 'express';
-import 'dotenv/config';
-import cors from 'cors';
-// Імпортуємо middleware
-import { errors } from 'celebrate';
-import { connectMongoDB } from './db/connectMongoDB.js';
-import { logger } from './middleware/logger.js';
-import { notFoundHandler } from './middleware/notFoundHandler.js';
-import { errorHandler } from './middleware/errorHandler.js';
-import notesRoutes from './routes/notesRoutes.js'; // тільки маршрути notes
-import authRoutes from './routes/authRoutes.js';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import { connectMongoDB } from './db/connectMongoDB.js';
+import authRoutes from './routes/authRoutes.js';
+import usersRoutes from './routes/usersRoutes.js';
+import storiesRoutes from './routes/storiesRoutes.js';
+import { errorHandler } from './middleware/errorHandler.js';
+import { notFoundHandler } from './middleware/notFoundHandler.js';
+import { logger } from './middleware/logger.js';
 
 const app = express();
-const PORT = process.env.PORT ?? 3000;
 
-// =======================
-// Глобальні middleware
-// =======================
-app.use(logger); // логування запитів через pino-http
-app.use(express.json()); // парсинг JSON тіла запитів
-app.use(cors()); // дозволяє запити з інших доменів
-app.use(cookieParser()); // парсинг cookie
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(cookieParser());
+app.use(express.json());
+app.use(logger);
 
-// =======================
-// Підключення маршрутів
-// =======================
-app.use(authRoutes); // маршрути для аутентифікації
-app.use(notesRoutes); // маршрути для нотаток
-app.use(userRoutes);
+// Routes
+app.use(authRoutes);
+app.use('/api', usersRoutes);
+app.use('/api', storiesRoutes);
 
-// =======================
-// Middleware 404 та обробки помилок
-// =======================
-app.use(notFoundHandler); // якщо маршрут не знайдено
-app.use(errors()); // обробка помилок від celebrate (валідація)
-app.use(errorHandler); // глобальний обробник помилок
+// 404
+app.use(notFoundHandler);
 
-// =======================
-// Підключення до MongoDB та запуск сервера
-// =======================
-await connectMongoDB();
+// Error handler
+app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const PORT = process.env.PORT || 3000;
+
+connectMongoDB().then(() => {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });

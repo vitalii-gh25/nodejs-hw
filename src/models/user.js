@@ -1,6 +1,6 @@
 // src/models/user.js
 
-import { model, Schema } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 const userSchema = new Schema(
   {
@@ -9,22 +9,18 @@ const userSchema = new Schema(
     password: { type: String, required: true },
     avatar: {
       type: String,
-      required: false,
       default: 'https://ac.goit.global/fullstack/react/default-avatar.jpg',
     },
+    savedArticles: [{ type: Schema.Types.ObjectId, ref: 'Articles' }], // NEW
   },
   { timestamps: true },
 );
 
-// Хук pre-save: якщо username не задано, ставимо email
 userSchema.pre('save', function (next) {
-  if (!this.username) {
-    this.username = this.email;
-  }
+  if (!this.username) this.username = this.email;
   next();
 });
 
-// Перевизначаємо метод toJSON, щоб видаляти пароль
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;

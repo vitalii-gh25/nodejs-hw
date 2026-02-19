@@ -1,6 +1,6 @@
 // src/models/session.js
 
-import { model, Schema } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 const sessionSchema = new Schema(
   {

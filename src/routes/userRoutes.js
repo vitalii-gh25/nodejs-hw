@@ -1,19 +1,20 @@
-// src/routes/userRoutes.js
+// src/routes/usersRoutes.js
 
 import { Router } from 'express';
 import { authenticate } from '../middleware/authenticate.js';
-import { updateUserAvatar } from '../controllers/userController.js';
-
-import { upload } from '../middleware/multer.js';
+import {
+  getUsers,
+  getUserById,
+  getCurrentUser,
+} from '../controllers/usersController.js';
 
 const router = Router();
 
-router.patch(
-  '/users/me/avatar',
-  authenticate,
-  // Додаємо після авторизації, але до контролера
-  upload.single('avatar'),
-  updateUserAvatar,
-);
+// Публічні
+router.get('/users', getUsers);
+router.get('/users/:id', getUserById);
+
+// Приватні
+router.get('/users/me', authenticate, getCurrentUser);
 
 export default router;
